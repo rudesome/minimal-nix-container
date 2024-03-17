@@ -1,17 +1,18 @@
-{ dockerTools
-, bashInteractive
+{ bashInteractive
+, buildEnv
 , cacert
 , coreutils
 , curl
+, dockerTools
+, extraContents ? [ ]
 , git
-, stdenv
 , gnutar
 , gzip
 , iana-etc
 , nix
 , openssh
+, stdenv
 , xz
-, extraContents ? [ ]
 }:
 let
   override = import ../../lib/override.nix { inherit git; };
@@ -19,25 +20,28 @@ let
   image = dockerTools.buildImageWithNixDb {
     inherit (nix) name;
 
-    contents = [
-      ./root
-      coreutils
-      # add /bin/sh
-      bashInteractive
-      nix
+    copyToRoot = buildEnv {
+      name = "image-root";
+      pathsToLink = [ "/bin" ];
+      paths = [
+        ./root
+        coreutils
+        # add /bin/sh
+        bashInteractive
+        nix
 
-      # runtime dependencies of nix
-      cacert
-      override.gitReallyMinimal
-      #gitMinimal
-      gnutar
-      gzip
-      openssh
-      xz
+        # runtime dependencies of nix
+        cacert
+        override.gitReallyMinimal
+        gnutar
+        gzip
+        openssh
+        xz
 
-      # for haskell binaries
-      iana-etc
-    ] ++ extraContents;
+        # for haskell binaries
+        iana-etc
+      ] ++ extraContents;
+    };
 
     extraCommands = ''
       # for /usr/bin/env
@@ -66,4 +70,6 @@ let
     };
   };
 in
-image // { meta = nix.meta // image.meta; }
+image // {
+  meta = nix.meta // image.meta;
+}
