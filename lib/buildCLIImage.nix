@@ -1,7 +1,6 @@
 { dockerTools
 , busybox
 , cacert
-, stdenv
 }:
 { drv # derivation to build the image for
   # Name of the binary to run by default
@@ -23,7 +22,6 @@ let
 
     config = {
       Cmd = [ "/bin/${binName}" ];
-      #Cmd = [ stdenv.shell ];
       Env = [
         "PATH=/bin"
         "SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt"
