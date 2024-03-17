@@ -14,7 +14,7 @@
     in
     {
 
-      buildCLIImage = pkgs.callPackage ./lib/buildCLIImage.nix { };
+      #buildCLIImage = pkgs.callPackage ./lib/buildCLIImage.nix { };
       nix = pkgs.callPackage ./images/nix { };
       flakes = pkgs.callPackage ./images/nix-flakes/default.nix { nix = self.nix; };
 
@@ -28,13 +28,15 @@
               with pkgs;
               buildEnv {
                 name = "image-${name}";
+
                 paths = [
+                  # example app
                   curl
-                  dockerTools.binSh
                 ];
+
               };
             config = {
-              Cmd = [ pkgs.stdenv.shell ];
+              Cmd = [ "/bin/bash" ];
             };
           };
       };
