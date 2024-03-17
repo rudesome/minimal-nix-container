@@ -39,7 +39,7 @@
           };
       };
 
-      devShells.default =
+      devShells.${system}.default =
         with pkgs;
         mkShell
           {
