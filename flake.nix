@@ -11,21 +11,21 @@
       pkgs = import nixpkgs { inherit system; };
       name = "flakes";
       tag = "latest";
+      #buildCLIImage = pkgs.callPackage ./lib/buildCLIImage.nix { };
+      nix = pkgs.callPackage ./images/nix { };
+      nix-flakes = pkgs.callPackage ./images/nix-flakes/default.nix { inherit nix; };
     in
     {
 
-      #buildCLIImage = pkgs.callPackage ./lib/buildCLIImage.nix { };
-      nix = pkgs.callPackage ./images/nix { };
-      flakes = pkgs.callPackage ./images/nix-flakes/default.nix { nix = self.nix; };
 
       packages.${system} = {
-        bare = self.nix;
+        bare = nix-flakes;
 
         default =
           with pkgs.dockerTools;
           buildImage {
             inherit name tag;
-            fromImage = self.flakes.flakeOverride;
+            fromImage = nix-flakes;
             copyToRoot =
               with pkgs;
               buildEnv {
@@ -53,5 +53,13 @@
             ];
           };
 
+      devShells."aarch64-darwin".default =
+        with pkgs;
+        mkShell
+          {
+            buildInputs = with pkgs; [
+              gnumake
+            ];
+          };
     };
 }
