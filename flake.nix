@@ -19,6 +19,8 @@
       flakes = pkgs.callPackage ./images/nix-flakes/default.nix { nix = self.nix; };
 
       packages.${system} = {
+        bare = self.nix;
+
         default =
           with pkgs.dockerTools;
           buildImage {
@@ -39,18 +41,17 @@
               Cmd = [ "/bin/bash" ];
             };
           };
+
+
+        devShells.${system}.default =
+          with pkgs;
+          mkShell
+            {
+              buildInputs = with pkgs; [
+                gnumake
+              ];
+            };
+
       };
-
-      devShells.${system}.default =
-        with pkgs;
-        mkShell
-          {
-            buildInputs = with pkgs; [
-              curl
-              git
-              jq
-            ];
-          };
-
     };
 }
