@@ -41,17 +41,17 @@
               Cmd = [ "/bin/bash" ];
             };
           };
-
-
-        devShells.${system}.default =
-          with pkgs;
-          mkShell
-            {
-              buildInputs = with pkgs; [
-                gnumake
-              ];
-            };
-
       };
+
+
+      devShells.${system}.default =
+        with pkgs;
+        mkShell
+          {
+            buildInputs = with pkgs; [
+              gnumake
+            ];
+          };
+
     };
 }
